@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: uniuser
+      POSTGRES_PASSWORD: unipass
+      POSTGRES_DB: university
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  lms-backend:
+    build: ./apps/lms-backend
+    environment:
+      DATABASE_URL: postgres://uniuser:unipass@db:5432/university
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+
+  web-portal:
+    build: ./apps/web-portal
+    ports:
+      - "3000:3000"
+    depends_on:
+      - lms-backend
+
+volumes:
+  pgdata:
